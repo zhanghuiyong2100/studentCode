@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    <!--1.配置数据库相关参数properties的属性-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--2.数据库连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--连接池属性-->
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!--c3p0连接池的属性-->
+        <property name="maxPoolSize" value="30"/>
+        <property name="minPoolSize" value="10"/>
+        <!--连接池在回收数据库连接时回滚未提交的事务-->
+        <property name="autoCommitOnClose" value="false"/>
+        <!--连接超时时间-->
+        <property name="checkoutTimeout" value="10000"/>
+        <!--获取连接失败的重试次数-->
+        <property name="acquireRetryAttempts" value="2"/>
+    </bean>
+    <!--3.配置sessionFactory  无需配置mybatis的映射文件-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据库连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--扫描entity包-->
+        <property name="typeAliasesPackage" value="com.feiyu.entity"/>
+        <!--扫描sql配置文件：mapper对应的xml文件-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+    <!--4.配置扫描Dao接口包-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--注入sessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory"/>
+        <!--需要扫描的接口包-->
+        <property name="basePackage" value="com.feiyu.dao"/>
+    </bean>
+
+    <!--5.事务管理-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+</beans>
