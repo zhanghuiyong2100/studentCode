@@ -1,5 +1,6 @@
-package com.feiyu.config;
+package com.feiyu.config.testconfig;
 
+import com.feiyu.config.JavaConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

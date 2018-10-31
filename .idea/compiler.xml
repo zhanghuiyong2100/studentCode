@@ -6,7 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="springMvc4x" />
         <module name="ssm-test" />
+        <module name="testdemo" />
       </profile>
     </annotationProcessing>
   </component>

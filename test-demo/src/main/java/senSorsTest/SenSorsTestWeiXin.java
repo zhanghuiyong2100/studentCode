@@ -14,7 +14,7 @@ import java.util.Map;
  * @描述: 微信下单成功埋点
  **/
 
-public class TestWeiXin {
+public class SenSorsTestWeiXin {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
         System.out.println("埋点测试开始");

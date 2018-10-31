@@ -24,10 +24,17 @@ public class DemoBeanIntegrationTests {
     private TestBean testBean;
 
     @Test
-    public void prodBeanShouldInject(){
-        String expeted="from production profile";
-        String actual=testBean.getContent();
-        Assert.assertEquals(expeted,actual);
+    public void prodBeanShouldInject() {
+        String expeted = "from production profile";
+        String actual = testBean.getContent();
+
+        try {
+            Assert.assertEquals(expeted, actual);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("結束");
+
 
     }
 

@@ -1,4 +1,4 @@
-package com.feiyu.config;
+package com.feiyu.config.testconfig;
 
 /**
  * @author 章辉勇

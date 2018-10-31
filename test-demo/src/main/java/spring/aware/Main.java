@@ -1,8 +1,6 @@
 package spring.aware;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import spring.application.event.DemoPublisher;
-import spring.application.event.EventConfig;
 
 /**
  * @author 章辉勇
