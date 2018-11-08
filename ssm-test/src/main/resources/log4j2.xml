@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<configuration status="WARN" monitorInterval="30">
+
+    <properties>
+
+        <!-- 配置日志文件输出目录 -->
+        <property name="TRACE_LOG_HOME">D:/code/work/ideaCode/mytest/ssm-test/logs/trace</property>
+        <property name="DEBUG_LOG_HOME">ssm-test/logs/debug</property>
+        <property name="INFO_LOG_HOME">ssm-test/logs/info</property>
+        <property name="WARN_LOG_HOME">ssm-test/logs/warn</property>
+        <property name="ERROR_LOG_HOME">ssm-test/logs/error</property>
+        <property name="FATAL_LOG_HOME">ssm-test/logs/fatal</property>
+        <property name="LOG_HOME">ssm-test/logs/log</property>
+        <!--配置日志文件名-->
+        <property name="TRACE_FILE_NAME">${date:yyyy-MM-dd}_log_trace</property>
+        <property name="DEBUG_FILE_NAME">${date:yyyy-MM-dd}_log_debug</property>
+        <property name="INFO_FILE_NAME">${date:yyyy-MM-dd}_log_info</property>
+        <property name="WARN_FILE_NAME">${date:yyyy-MM-dd}_log_warn</property>
+        <property name="ERROR_FILE_NAME">${date:yyyy-MM-dd}_log_error</property>
+        <property name="FATAL_FILE_NAME">${date:yyyy-MM-dd}_log_fatal</property>
+        <!--日志内容自定义输出格式,暂时不用-->
+        <property name="PATTERN_OUT">%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} %l - %msg%n</property>
+    </properties>
+    <!--自定义级别-->
+    <CustomLevels>
+        <CustomLevel name="DPAP_LOG_LEVEL" intLevel="350"/>
+    </CustomLevels>
+
+    <!--先定义所有的appender-->
+    <appenders>
+        <!--这个输出控制台的配置-->
+        <!--输出到控制台 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用-->
+        <File name="log" fileName="ssm-test/logs/log/test.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+        </File>
+
+        <!--Rolling的意思是当满足一定条件后，就重命名原日志文件用于备份，并从新生成一个新的日志文件-->
+        <!--
+        fileName  指定当前日志文件的位置和文件名称
+        filePattern  指定当发生Rolling时，文件的转移和重命名规则
+        SizeBasedTriggeringPolicy  指定当文件体积大于size指定的值时，触发Rolling
+        DefaultRolloverStrategy  指定最多保存的文件个数
+        TimeBasedTriggeringPolicy  这个配置需要和filePattern结合使用，注意filePattern中配置的文件重命名规则是${FILE_NAME}-%d{yyyy-MM-dd HH-mm}-%i，最小的时间粒度是mm，即分钟，
+        TimeBasedTriggeringPolicy  指定的size是1，结合起来就是每1分钟生成一个新文件。如果改成%d{yyyy-MM-dd HH}，最小粒度为小时，则每一个小时生成一个文件。
+         -->
+        <RollingRandomAccessFile name="myTest-log"
+                                 fileName="${LOG_HOME}/myTest_log4j.log"
+                                 filePattern="${LOG_HOME}/eco_phonerest_log4j.log.%d{yyyy-MM-dd-HH}"
+                                 additivity="false">
+            <PatternLayout pattern="%m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true"
+                                           interval="1"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+
+        <!--Appender 2. 输出到滚动保存的文件, 触发保存日志文件的条件是日志文件大于10 MB，只保存最新的20个日志 -->
+        <!--trace级别log-->
+        <RollingRandomAccessFile name="trace-running-log"
+                                 fileName="${TRACE_LOG_HOME}/${TRACE_FILE_NAME}.log"
+                                 filePattern="${TRACE_LOG_HOME}/$${date:yyyy-MM}/${TRACE_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+                <ThresholdFilter level="debug" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <!--<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} %l - %msg%n"/>-->
+            <!--
+            自定义格式:%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} %l - %msg%n
+            文本样例：2018-11-07 15:41:37.474 [main] TRACE  com.feiyu.utils.Log4jUtil.main(Log4jUtil.java:17) - trace level
+            组成：
+            %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+            %l  输出语句所在的行数, 包括类名、方法名、文件名、行数
+            %t 输出当前线程名称
+            %-5level 输出日志级别，-5表示左对齐并且固定输出5个字符，如果不足在右边补0
+            %msg 日志文本
+            %n 换行
+            ——————————————————————————————————————————
+            %p : 日志输出格式
+            %c : logger的名称
+            %m : 日志内容，即 logger.info("message")
+            %n : 换行符
+            %C : Java类名
+            %L : 日志输出所在行数
+            %M : 日志输出所在方法名
+            %d{HH:mm:ss.SSS} 表示输出到毫秒的时间
+            %t 输出当前线程名称
+            %-5level 输出日志级别，-5表示左对齐并且固定输出5个字符，如果不足在右边补0
+            %logger 输出logger名称，因为Root Logger没有名称，所以没有输出
+            %msg 日志文本
+            %n 换行
+            其他常用的占位符有：
+            %F 输出所在的类文件名，如Client.java
+            %L 输出行号
+            %M 输出所在方法名
+            %l  输出语句所在的行数, 包括类名、方法名、文件名、行数
+         -->
+
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy 中的参数max，可以限制 SizeBasedTriggeringPolicy中size超出后，只保留max个存档 -->
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+        <!--debug级别log-->
+        <RollingRandomAccessFile name="debug-running-log"
+                                 fileName="${DEBUG_LOG_HOME}/${DEBUG_FILE_NAME}.log"
+                                 filePattern="${DEBUG_LOG_HOME}/$${date:yyyy-MM}/${DEBUG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+        <!--info级别log-->
+        <RollingRandomAccessFile name="info-running-log"
+                                 fileName="${INFO_LOG_HOME}/${INFO_FILE_NAME}.log"
+                                 filePattern="${INFO_LOG_HOME}/$${date:yyyy-MM}/${INFO_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <!-- 输出日志级别为 info 的日志 -->
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <!--warn级别log-->
+        <RollingRandomAccessFile name="warn-running-log"
+                                 fileName="${WARN_LOG_HOME}/${WARN_FILE_NAME}.log"
+                                 filePattern="${WARN_LOG_HOME}/$${date:yyyy-MM}/${WARN_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <!-- 输出日志级别为 warn 的日志 -->
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <!-- 输出日志级别为 error 的日志 -->
+        <RollingRandomAccessFile name="error-running-log"
+                                 fileName="${ERROR_LOG_HOME}/${ERROR_FILE_NAME}.log"
+                                 filePattern="${ERROR_LOG_HOME}/$${date:yyyy-MM}/${ERROR_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <!-- 输出日志级别为 fatal 的日志 -->
+        <RollingRandomAccessFile name="fatal-running-log"
+                                 fileName="${FATAL_LOG_HOME}/${FATAL_FILE_NAME}.log"
+                                 filePattern="${FATAL_LOG_HOME}/$${date:yyyy-MM}/${FATAL_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+    </appenders>
+
+
+    <Loggers>
+        <!-- 配置日志的根节点 -->
+        <!-- 日志级别顺序为 TRACE < DEBUG < INFO < WARN < ERROR < FATAL -->
+        <Root level="TRACE">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="trace-running-log"/>
+            <AppenderRef ref="debug-running-log"/>
+            <AppenderRef ref="info-running-log"/>
+            <AppenderRef ref="warn-running-log"/>
+            <AppenderRef ref="error-running-log"/>
+            <AppenderRef ref="fatal-running-log"/>
+        </Root>
+        <!-- 自定义日志 -->
+        <logger name="DPAP">
+            <AppenderRef ref="myTest-log"/>
+        </logger>
+        <!-- 日志实例(info),其中'service-log'继承root,但是root将日志输出控制台,而'service-log'将日志输出到文件,通过属性'additivity="false"'将'service-log'的
+     的日志不再输出到控制台 -->
+        <!--<logger name="info-running-log" level="info" includeLocation="true" additivity="true">-->
+        <!--<appender-ref ref="info-running-log"/>-->
+        <!--</logger>-->
+    </Loggers>
+</configuration>

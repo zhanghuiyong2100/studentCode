@@ -13,7 +13,4 @@
         <module>springMvc4.x</module>
         <module>test-demo</module>
     </modules>
-
-
-
 </project>

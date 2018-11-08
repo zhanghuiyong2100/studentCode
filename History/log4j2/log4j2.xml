@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off" monitorInterval="1800">
+	<properties>
+		<property name="TRACE_LOG_HOME">logs/eco/trace</property>
+		<property name="DEBUG_LOG_HOME">logs/eco/debug</property>
+		<property name="INFO_LOG_HOME">logs/eco/info</property>
+		<property name="WARN_LOG_HOME">logs/eco/warn</property>
+		<property name="ERROR_LOG_HOME">logs/eco/error</property>
+		<property name="FATAL_LOG_HOME">logs/eco/fatal</property>
+
+		<property name="TRACE_FILE_NAME">ecolog_trace</property>
+		<property name="DEBUG_FILE_NAME">ecolog_debug</property>
+		<property name="INFO_FILE_NAME">ecolog_info</property>
+		<property name="WARN_FILE_NAME">ecolog_warn</property>
+		<property name="ERROR_FILE_NAME">ecolog_error</property>
+		<property name="FATAL_FILE_NAME">ecolog_fatal</property>
+	</properties>
+	<CustomLevels>
+		<CustomLevel name="DPAP_LOG_LEVEL" intLevel="350" />
+	</CustomLevels>
+
+	<Appenders>
+		<!--输出到控制台 -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<!-- 菜鸟日志配置 start -->
+		<RollingRandomAccessFile name="dpap-log"
+			fileName="/opt/log4j/eco_phonerest_log4j.log" filePattern="/opt/log4j/eco_phonerest_log4j.log.%d{yyyy-MM-dd-HH}"
+			additivity="false">
+			<PatternLayout pattern="%m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+				<!-- <SizeBasedTriggeringPolicy size="10 MB" /> -->
+			</Policies>
+		</RollingRandomAccessFile>
+		<!-- 菜鸟日志配置 end -->
+		<!-- 将日志文件按级别分类存放 -->
+		<!--Appender 2. 输出到滚动保存的文件, 触发保存日志文件的条件是日志文件大于10 MB，只保存最新的20个日志 -->
+		<RollingRandomAccessFile name="trace-running-log"
+			fileName="${TRACE_LOG_HOME}/${TRACE_FILE_NAME}.log"
+			filePattern="${TRACE_LOG_HOME}/$${date:yyyy-MM}/${TRACE_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="debug" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="trace" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<!-- DefaultRolloverStrategy 中的参数max，可以限制 SizeBasedTriggeringPolicy中size超出后，只保留max个存档 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+		<RollingRandomAccessFile name="debug-running-log"
+			fileName="${DEBUG_LOG_HOME}/${DEBUG_FILE_NAME}.log"
+			filePattern="${DEBUG_LOG_HOME}/$${date:yyyy-MM}/${DEBUG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="info" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="debug" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+		<RollingRandomAccessFile name="info-running-log"
+			fileName="${INFO_LOG_HOME}/${INFO_FILE_NAME}.log"
+			filePattern="${INFO_LOG_HOME}/$${date:yyyy-MM}/${INFO_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<!-- 输出日志级别为 info 的日志 -->
+				<ThresholdFilter level="warn" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="info" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+		<RollingRandomAccessFile name="warn-running-log"
+			fileName="${WARN_LOG_HOME}/${WARN_FILE_NAME}.log"
+			filePattern="${WARN_LOG_HOME}/$${date:yyyy-MM}/${WARN_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<!-- 输出日志级别为 warn 的日志 -->
+				<ThresholdFilter level="error" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="warn" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+		<RollingRandomAccessFile name="error-running-log"
+			fileName="${ERROR_LOG_HOME}/${ERROR_FILE_NAME}.log"
+			filePattern="${ERROR_LOG_HOME}/$${date:yyyy-MM}/${ERROR_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<!-- 输出日志级别为 error 的日志 -->
+				<ThresholdFilter level="fatal" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="error" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+		<RollingRandomAccessFile name="fatal-running-log"
+			fileName="${FATAL_LOG_HOME}/${FATAL_FILE_NAME}.log"
+			filePattern="${FATAL_LOG_HOME}/$${date:yyyy-MM}/${FATAL_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="fatal" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<PatternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+	</Appenders>
+
+	<Loggers>
+		<!-- 日志级别顺序为 TRACE < DEBUG < INFO < WARN < ERROR < FATAL -->
+		<Root level="TRACE">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="trace-running-log" />
+			<AppenderRef ref="debug-running-log" />
+			<AppenderRef ref="info-running-log" />
+			<AppenderRef ref="warn-running-log" />
+			<AppenderRef ref="error-running-log" />
+			<AppenderRef ref="fatal-running-log" />
+		</Root>
+		<!-- 自定义日志,用于菜鸟日志 -->
+		<Logger name="DPAP">
+			<AppenderRef ref="dpap-log" />
+		</Logger>
+	</Loggers>
+</Configuration>
