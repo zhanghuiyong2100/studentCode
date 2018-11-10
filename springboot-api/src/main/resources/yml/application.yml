@@ -1,0 +1,5 @@
+#沒有放在根目錄中，所以配置
+server:
+  port: 9099
+  servlet:
+    context-path: /index

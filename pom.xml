@@ -15,6 +15,7 @@
     </properties>
     <modules>
         <module>springboot-api</module>
+        <module>springboot-war</module>
     </modules>
 
 
