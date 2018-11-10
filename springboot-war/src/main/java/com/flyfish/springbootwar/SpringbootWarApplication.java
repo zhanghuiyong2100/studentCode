@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 public class SpringbootWarApplication extends SpringBootServletInitializer {
 
-    @RequestMapping("/")
+    //@RequestMapping("/")
     public String index() {
         return "springboot  War包界面";
     }
