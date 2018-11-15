@@ -1,6 +1,5 @@
-package com.springboot.api.web.controller;
+package com.springboot.api.web.restcontroller;
 
-import com.springboot.api.aspect.Action;
 import com.springboot.api.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
