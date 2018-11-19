@@ -2,6 +2,7 @@ package com.springboot.api.web.restcontroller;
 
 import com.springboot.api.dao.PersonRepository;
 import com.springboot.api.domain.Person;
+import com.springboot.api.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,8 @@ public class PersonRestController {
      */
     @Autowired
     PersonRepository personRepository;
+    @Autowired
+    PersonService personService;
 
     /**
      * 保存
@@ -92,7 +95,7 @@ public class PersonRestController {
     /**
      * 測試分頁
      */
-    //@RequestMapping("/page")
+    @RequestMapping("/page")
     public Page<Person> page() {
         Page<Person> repositoryAll = personRepository.findAll(new Pageable() {
             @Override
@@ -137,6 +140,62 @@ public class PersonRestController {
             }
         });
         return repositoryAll;
+    }
+
+    /**
+     * 则试 回滚
+     */
+    @RequestMapping("/rollback")
+    public Person rollback(Person person) {
+        Person personWithRollBack = personService.savePersonWithRollBack(person);
+        return personWithRollBack;
+    }
+
+    /**
+     * 则试 不回滚
+     */
+    @RequestMapping("/norollback")
+    public Person norollback(Person person) {
+        Person personnot = personService.savePersonWithoutRollBack(person);
+        return personnot;
+    }
+
+    /**
+     * <p> 缓存测试 新增 </p>
+     *
+     * @param person
+     * @return
+     * @其它信息
+     */
+    @RequestMapping("/put")
+    public Person put(Person person) {
+        return personService.save(person);
+    }
+
+    /**
+     * <p> 缓存测试 查找 </p>
+     *
+     * @param
+     * @return
+     * @其它信息
+     */
+    @RequestMapping("/able")
+    public Person able(Person person) {
+        return personService.findOne(person);
+    }
+
+
+    /**
+     * <p> 缓存测试 删除 </p>
+     *
+     * @param
+     * @return
+     * @其它信息
+     */
+    @RequestMapping("/evit")
+    public String evit(Person person) {
+        personService.remove(person.getId());
+        return "OK";
     }
 
 }

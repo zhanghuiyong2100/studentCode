@@ -4,11 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @SpringBootApplication
+/** 开启缓存*/
+@EnableCaching
 public class SpringbootApiApplication extends SpringBootServletInitializer {
 
     @RequestMapping("/index")
@@ -33,6 +36,8 @@ public class SpringbootApiApplication extends SpringBootServletInitializer {
         // 注意这里要指向原先用main方法执行的Application启动类
         return builder.sources(SpringbootApiApplication.class);
     }
+
+
 
 
 }
