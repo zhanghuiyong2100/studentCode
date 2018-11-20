@@ -7,36 +7,43 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{//1
-	
-	@Bean
-	UserDetailsService customUserService(){ //2
-		return new CustomUserService();
-	}
-	
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(customUserService()); //3
-		
-	}
-	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-						.anyRequest().authenticated() //4
-						.and()
-						.formLogin()
-							.loginPage("/login")
-							.failureUrl("/login?error")
-							.permitAll() //5
-						.and()
-						.logout().permitAll(); //6
-		
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {//1
 
-	}
+    @Bean
+    UserDetailsService customUserService() { //2
+        return new CustomUserService();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserService());
+
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .anyRequest().authenticated() //4
+                .and()
+                .formLogin()
+                .loginPage("/login")
+                .failureUrl("/login?error")
+                .permitAll() //5
+                .and()
+                .logout().permitAll(); //6
+
+
+    }
 
 
 }
