@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.validation.constraints.Size;
 
 /**
  * @author 章辉勇
@@ -27,6 +28,8 @@ public class Person {
     /**
      * 姓名
      */
+    /** ①此处使用JSR-303注解来校验数据。*/
+    @Size(max = 4, min = 2)
     private String name;
     /**
      * 年龄
